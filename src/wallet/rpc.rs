@@ -132,7 +132,7 @@ impl RpcClient {
     pub fn get_transaction(&self, hash: Byte32) -> Option<TransactionWithStatus> {
         self.inner
             .get_transaction(hash.unpack())
-            .expect("rpc call get_transaction")
+            .expect("rpc call get_transaction") // this panics :(
     }
     pub fn send_transaction(&self, tx: Transaction) -> Byte32 {
         self.send_transaction_result(tx)

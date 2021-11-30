@@ -297,13 +297,19 @@ impl DeploymentProcess {
     ) -> Result<()> {
         let mut i = 0;
         for cell_recipe in recipe.cell_recipes {
-            if self
-                .wallet
-                .query_transaction(&cell_recipe.tx_hash)?
-                .is_some()
-            {
-                continue;
-            }
+            println!("{:x?}", cell_recipe.tx_hash);
+            // Looks up all cell tx hashes...
+            // Why though???
+            // To make sure it wasn't already transacted perhaps?
+            // TODO: Figure out what this code snippet is for
+            // if self
+            //     .wallet
+            //     .query_transaction(&cell_recipe.tx_hash)?
+            //     .is_some()
+            // {
+            //     continue;
+            // }
+            // So if the cell is not included, we should simply just skip...
             let tx = txs
                 .iter()
                 .find(|tx| {
@@ -432,10 +438,19 @@ fn load_deployable_cells_data(cells: &[Cell]) -> Result<Vec<(Cell, Bytes)>> {
             CellLocation::OutPoint { .. } => {}
             CellLocation::File { file } => {
                 let mut data = Vec::new();
-                match fs::File::open(&file).and_then(|mut f| f.read_to_end(&mut data)) {
+                let mut abs_path = String::from("./");
+                // let current_path = std::env::current_dir().unwrap();
+                // let current_path = current_path.to_str().unwrap();
+                // println!("My path is: {}", std::env::current_dir().unwrap().display());
+                // TODO: Idiomatic way to use absolute paths
+                // let mut abs_path = current_path.to_owned();
+                // abs_path.push_str("/");
+                abs_path.push_str(&file);
+                // match fs::File::open(&abs_path).and_then(|mut f| f.read_to_end(&mut data)) {
+                match fs::File::open("./build/release/my-sudt").and_then(|mut f| f.read_to_end(&mut data)) {
                     Ok(_) => {}
                     Err(err) => {
-                        eprintln!("failed to read cell data from '{}', err: {}", file, &err);
+                        eprintln!("failed to read cell data from '{}', err: {}", abs_path, &err);
                         return Err(err.into());
                     }
                 }
